@@ -1,20 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Map from "./components/Map";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
   const [origin, setOrigin] = useState("Amihan Bungalows Siargao");
   const [mode, setMode] = useState("driving");
-  const [numberOfMaps, setNumberOfMaps] = useState(1);
+  const [maps, setMaps] = useState(["Cloud 9 Boardwalk"]);
+  const searchParams = useSearchParams();
 
-  const modes = ["driving", "walking", "bicycling", "transit", "flying"];
+  const originSearch = searchParams.get("origin") || origin;
+  const destinationSearch = searchParams.get("destination") || "";
+  const destinations = destinationSearch?.split(",");
+
+  const modes = [
+    "🚗 driving",
+    "🚶‍♂️ walking",
+    "🚴‍♂️ bicycling",
+    "🚌 transit",
+    "✈️ flying",
+  ];
 
   const convertText = (text: string) => {
     const splitText = text.split(" ");
     const query = splitText.join("+");
     return query;
   };
+
+  useEffect(() => {
+    if (originSearch || destinationSearch) {
+      setOrigin(originSearch);
+      setMaps(destinations);
+    }
+  }, []);
 
   return (
     <main className="p-12 grid">
@@ -33,15 +52,21 @@ export default function Home() {
       <div className="flex gap-2 pb-4">
         <button
           className="p-2 bg-gray-500 rounded hover:bg-gray-50 hover:text-black"
-          onClick={() => setNumberOfMaps(numberOfMaps + 1)}
+          onClick={() => setMaps((maps) => [...maps, ""])}
         >
-          Add Map
+          🗺️ Add Map
         </button>
         <button
-          className="p-2 bg-gray-500 rounded hover:bg-gray-50 hover:text-black"
-          onClick={() => setNumberOfMaps(numberOfMaps - 1)}
+          className="p-2 bg-gray-500 rounded hover:bg-gray-50 hover:text-black max-w-max"
+          onClick={() =>
+            navigator.clipboard.writeText(
+              `${
+                window.location.host
+              }/?origin=${origin}&destination=${maps.join(",")}`
+            )
+          }
         >
-          Remove Map
+          🔗 Save Search and Create URL
         </button>
       </div>
       <div className="pb-6 flex gap-2 flex-col md:flex-row">
@@ -56,10 +81,10 @@ export default function Home() {
           {modes.map((travelMode, index) => {
             return (
               <button
-                onClick={() => setMode(travelMode)}
+                onClick={() => setMode(travelMode.split(" ")[1])}
                 key={index}
                 className={`p-2 rounded ${
-                  mode === travelMode
+                  mode === travelMode.split(" ")[1]
                     ? "bg-gray-50 text-black"
                     : "bg-gray-500 hover:bg-gray-50 hover:text-black"
                 }`}
@@ -71,13 +96,16 @@ export default function Home() {
         </div>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        {Array.from({ length: numberOfMaps }, (_, i) => i + 1).map((id) => {
+        {maps.map((destination, index) => {
           return (
             <Map
               origin={origin}
               mode={mode}
               convertText={convertText}
-              key={id}
+              maps={maps}
+              setMaps={setMaps}
+              mapNumber={index}
+              key={index}
             />
           );
         })}
