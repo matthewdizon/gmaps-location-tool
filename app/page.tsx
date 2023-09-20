@@ -30,46 +30,44 @@ export default function Home() {
       <h2 className="text-2xl font-bold py-2">
         Origin: {origin.split("+").join(" ") || "None"}
       </h2>
-      <div className="flex flex-col md:flex-row">
-        <div className="flex gap-2 pb-4">
-          <button
-            className="p-2 bg-gray-500 rounded hover:bg-gray-50 hover:text-black"
-            onClick={() => setNumberOfMaps(numberOfMaps + 1)}
-          >
-            Add Map
-          </button>
-          <button
-            className="p-2 bg-gray-500 rounded hover:bg-gray-50 hover:text-black"
-            onClick={() => setNumberOfMaps(numberOfMaps - 1)}
-          >
-            Remove Map
-          </button>
-        </div>
-        <div className="pb-6 flex gap-2">
-          <input
-            type="text"
-            placeholder="Origin"
-            value={origin.split("+").join(" ")}
-            className="rounded text-black"
-            onChange={(e) => setOrigin(convertText(e.target.value))}
-          />
-          <div className="flex gap-2">
-            {modes.map((travelMode, index) => {
-              return (
-                <button
-                  onClick={() => setMode(travelMode)}
-                  key={index}
-                  className={`p-2 rounded ${
-                    mode === travelMode
-                      ? "bg-gray-50 text-black"
-                      : "bg-gray-500 hover:bg-gray-50 hover:text-black"
-                  }`}
-                >
-                  {travelMode.toUpperCase()}
-                </button>
-              );
-            })}
-          </div>
+      <div className="flex gap-2 pb-4">
+        <button
+          className="p-2 bg-gray-500 rounded hover:bg-gray-50 hover:text-black"
+          onClick={() => setNumberOfMaps(numberOfMaps + 1)}
+        >
+          Add Map
+        </button>
+        <button
+          className="p-2 bg-gray-500 rounded hover:bg-gray-50 hover:text-black"
+          onClick={() => setNumberOfMaps(numberOfMaps - 1)}
+        >
+          Remove Map
+        </button>
+      </div>
+      <div className="pb-6 flex gap-2 flex-col md:flex-row">
+        <input
+          type="text"
+          placeholder="Origin"
+          value={origin.split("+").join(" ")}
+          className="rounded text-black"
+          onChange={(e) => setOrigin(convertText(e.target.value))}
+        />
+        <div className="flex gap-2">
+          {modes.map((travelMode, index) => {
+            return (
+              <button
+                onClick={() => setMode(travelMode)}
+                key={index}
+                className={`p-2 rounded ${
+                  mode === travelMode
+                    ? "bg-gray-50 text-black"
+                    : "bg-gray-500 hover:bg-gray-50 hover:text-black"
+                }`}
+              >
+                {travelMode.toUpperCase()}
+              </button>
+            );
+          })}
         </div>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
