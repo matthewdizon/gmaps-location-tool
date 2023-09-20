@@ -60,7 +60,7 @@ export default function Home() {
           className="p-2 bg-gray-500 rounded hover:bg-gray-50 hover:text-black max-w-max"
           onClick={() =>
             navigator.clipboard.writeText(
-              `${
+              `http://${
                 window.location.host
               }/?origin=${origin}&destination=${maps.join(",")}`
             )
