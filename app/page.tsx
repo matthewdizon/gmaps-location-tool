@@ -11,7 +11,7 @@ export default function Home() {
   const searchParams = useSearchParams();
 
   const originSearch = searchParams.get("origin") || origin;
-  const destinationSearch = searchParams.get("destination") || "";
+  const destinationSearch = searchParams.get("destination") || maps[0];
   const destinations = destinationSearch?.split(",");
 
   const modes = [
