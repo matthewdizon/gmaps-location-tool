@@ -34,8 +34,8 @@ const Map = ({ origin, mode, convertText, maps, setMaps, mapNumber }) => {
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 px-2">
-                <HelpCircle className="h-4 w-4 mr-2" />
-                Need Help?
+                <HelpCircle className="h-4 w-4 mr-0 sm:mr-2" />
+                <span className="hidden sm:inline">Need Help?</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">

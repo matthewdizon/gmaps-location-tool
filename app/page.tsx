@@ -180,8 +180,8 @@ export default function Home() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
-      <div className="flex items-start gap-4">
+    <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 lg:px-8 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start gap-2 sm:gap-4">
         <Image
           src="/images/gmaps-tool-logo.png"
           alt="Google Maps Tool Logo"
@@ -189,11 +189,11 @@ export default function Home() {
           height={64}
           priority
         />
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+        <div className="mt-2 sm:mt-0">
+          <h1 className="text-2xl sm:text-4xl font-bold tracking-tight">
             Google Maps Location Tool
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
+          <p className="text-xs sm:text-base text-muted-foreground max-w-2xl">
             This tool helps you figure out the distance from one location to
             another. Perfect for understanding how far a property is from key
             locations like your workplace, university, or shopping centers.
@@ -201,11 +201,11 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4">
         <Card className="w-full">
-          <CardHeader className="px-4 sm:px-6">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+          <CardHeader className="px-2 sm:px-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-xl">
                 <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
                 Origin: {origin.split("+").join(" ") || "None"}
               </CardTitle>
@@ -214,7 +214,7 @@ export default function Home() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="whitespace-nowrap"
+                    className="whitespace-nowrap w-full sm:w-auto"
                   >
                     <Sparkles className="h-4 w-4 mr-2" />
                     Location Presets
@@ -248,14 +248,14 @@ export default function Home() {
               </Dialog>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4 px-4 sm:px-6">
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <CardContent className="space-y-3 px-2 sm:px-6">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
               <Input
                 type="text"
                 placeholder="Enter origin location"
                 value={origin.split("+").join(" ")}
                 onChange={(e) => setOrigin(convertText(e.target.value))}
-                className="flex-1 text-sm sm:text-base"
+                className="flex-1 text-xs sm:text-base w-full"
               />
             </div>
 
@@ -281,19 +281,23 @@ export default function Home() {
 
         {maps.length === 0 ? (
           <Card className="w-full border-dashed">
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-              <MapPin className="h-12 w-12 text-muted-foreground" />
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold">
+            <CardContent className="flex flex-col items-center justify-center py-8 sm:py-12 text-center space-y-3 sm:space-y-4">
+              <MapPin className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground" />
+              <div className="space-y-1 sm:space-y-2">
+                <h3 className="text-base sm:text-lg font-semibold">
                   No destinations added yet
                 </h3>
-                <p className="text-sm text-muted-foreground max-w-sm">
+                <p className="text-xs sm:text-sm text-muted-foreground max-w-sm">
                   Click the &quot;Add Destination&quot; button above to start
                   comparing distances from your origin to different
                   destinations.
                 </p>
               </div>
-              <Button variant="outline" onClick={handleAddMap} className="mt-2">
+              <Button
+                variant="outline"
+                onClick={handleAddMap}
+                className="mt-2 w-full sm:w-auto"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Your First Destination
               </Button>
@@ -301,14 +305,14 @@ export default function Home() {
           </Card>
         ) : (
           <Card className="w-full">
-            <CardHeader className="px-4 sm:px-6">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg sm:text-xl">Overview</CardTitle>
-                <div className="flex gap-2">
+            <CardHeader className="px-2 sm:px-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <CardTitle className="text-base sm:text-xl">Overview</CardTitle>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   <Button
                     variant="outline"
                     onClick={handleAddMap}
-                    className="whitespace-nowrap text-sm sm:text-base"
+                    className="whitespace-nowrap text-xs sm:text-base w-full sm:w-auto"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Destination
@@ -316,7 +320,7 @@ export default function Home() {
                   <Button
                     variant="outline"
                     onClick={handleShareUrl}
-                    className="whitespace-nowrap text-sm sm:text-base"
+                    className="whitespace-nowrap text-xs sm:text-base w-full sm:w-auto"
                   >
                     <Share2 className="h-4 w-4 mr-2" />
                     Share URL
@@ -324,9 +328,9 @@ export default function Home() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="px-4 sm:px-6 space-y-3">
+            <CardContent className="px-2 sm:px-6 space-y-2 sm:space-y-3">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                   Destinations ({maps.length})
                 </p>
                 <ul className="space-y-2">
@@ -340,7 +344,7 @@ export default function Home() {
                           <Input
                             value={editValue}
                             onChange={(e) => setEditValue(e.target.value)}
-                            className="h-8"
+                            className="h-8 text-xs sm:text-base"
                             autoFocus
                           />
                           <Button
@@ -362,7 +366,7 @@ export default function Home() {
                         </div>
                       ) : (
                         <>
-                          <span className="text-base">
+                          <span className="text-sm sm:text-base">
                             {destination.split("+").join(" ")}
                           </span>
                           <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -404,12 +408,12 @@ export default function Home() {
         )}
       </div>
 
-      <Separator className="my-4 sm:my-6" />
+      <Separator className="my-3 sm:my-6" />
 
       {maps.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4">
           {maps.map((destination, index) => (
-            <div id={`map-${index}`} key={index}>
+            <div id={`map-${index}`} key={index} className="mb-4">
               <Map
                 origin={origin}
                 mode={mode}
