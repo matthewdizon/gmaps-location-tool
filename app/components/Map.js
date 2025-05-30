@@ -5,23 +5,27 @@ import { MapPin, X } from "lucide-react";
 
 const Map = ({ origin, mode, convertText, maps, setMaps, mapNumber }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
+    <Card className="w-full">
+      <CardHeader className="px-4 sm:px-6 py-4">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           <MapPin className="h-4 w-4" />
-          Destination: {maps[mapNumber].split("+").join(" ") || "None"}
+          <span className="truncate">
+            Destination: {maps[mapNumber].split("+").join(" ") || "None"}
+          </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <iframe
-          className="rounded-lg w-full min-h-[40vh] border"
-          loading="lazy"
-          src={`https://www.google.com/maps/embed/v1/directions?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API}
-            &origin=${origin}
-            &destination=${maps[mapNumber]}
-            &mode=${mode}
-          `}
-        />
+      <CardContent className="space-y-4 px-4 sm:px-6 pb-4">
+        <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+          <iframe
+            className="absolute inset-0 w-full h-full rounded-lg border"
+            loading="lazy"
+            src={`https://www.google.com/maps/embed/v1/directions?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API}
+              &origin=${origin}
+              &destination=${maps[mapNumber]}
+              &mode=${mode}
+            `}
+          />
+        </div>
         <div className="flex gap-2">
           <Input
             type="text"
@@ -32,7 +36,7 @@ const Map = ({ origin, mode, convertText, maps, setMaps, mapNumber }) => {
               newMaps[mapNumber] = convertText(e.target.value);
               setMaps(newMaps);
             }}
-            className="flex-1"
+            className="flex-1 text-sm sm:text-base"
           />
           <Button
             variant="destructive"
@@ -40,6 +44,7 @@ const Map = ({ origin, mode, convertText, maps, setMaps, mapNumber }) => {
             onClick={() =>
               setMaps((maps) => maps.filter((_, index) => index !== mapNumber))
             }
+            className="shrink-0"
           >
             <X className="h-4 w-4" />
           </Button>

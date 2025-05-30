@@ -42,39 +42,39 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="container mx-auto p-6 space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">
+    <main className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+      <div className="space-y-3 sm:space-y-4">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
           Google Maps Location Tool
         </h1>
-        <p className="text-muted-foreground max-w-2xl">
+        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
           This tool helps you figure out the distance from one location to
           another. Perfect for understanding how far a property is from key
           locations like your workplace, university, or shopping centers.
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
+      <Card className="w-full">
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
             Origin: {origin.split("+").join(" ") || "None"}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
+        <CardContent className="space-y-4 px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Input
               type="text"
               placeholder="Enter origin location"
               value={origin.split("+").join(" ")}
               onChange={(e) => setOrigin(convertText(e.target.value))}
-              className="flex-1"
+              className="flex-1 text-sm sm:text-base"
             />
-            <div className="flex gap-2">
+            <div className="flex gap-2 sm:gap-3">
               <Button
                 variant="outline"
                 onClick={() => setMaps((maps) => [...maps, ""])}
-                className="whitespace-nowrap"
+                className="flex-1 sm:flex-none whitespace-nowrap text-sm sm:text-base"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Map
@@ -88,7 +88,7 @@ export default function Home() {
                     }/?origin=${origin}&destination=${maps.join(",")}`
                   )
                 }
-                className="whitespace-nowrap"
+                className="flex-1 sm:flex-none whitespace-nowrap text-sm sm:text-base"
               >
                 <Share2 className="h-4 w-4 mr-2" />
                 Share URL
@@ -97,12 +97,12 @@ export default function Home() {
           </div>
 
           <Tabs defaultValue={mode} onValueChange={setMode} className="w-full">
-            <TabsList className="grid grid-cols-5 w-full">
+            <TabsList className="grid grid-cols-3 sm:grid-cols-5 w-full h-auto p-1">
               {modes.map((travelMode, index) => (
                 <TabsTrigger
                   key={index}
                   value={travelMode.split(" ")[1]}
-                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  className="text-xs sm:text-sm py-2 px-1 sm:px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   {travelMode}
                 </TabsTrigger>
@@ -112,9 +112,9 @@ export default function Home() {
         </CardContent>
       </Card>
 
-      <Separator />
+      <Separator className="my-4 sm:my-6" />
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {maps.map((destination, index) => (
           <Map
             origin={origin}
