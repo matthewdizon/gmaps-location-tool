@@ -8,9 +8,25 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Share2, Plus, MapPin, Trash2, Pencil, Check, X } from "lucide-react";
+import {
+  Share2,
+  Plus,
+  MapPin,
+  Trash2,
+  Pencil,
+  Check,
+  X,
+  Sparkles,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Home() {
   const [origin, setOrigin] = useState("Amihan Bungalows Siargao");
@@ -20,6 +36,7 @@ export default function Home() {
   const { toast } = useToast();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [showPresets, setShowPresets] = useState(false);
 
   const originSearch = searchParams.get("origin") || origin;
   const destinationSearch = searchParams.get("destination") || maps[0];
@@ -105,6 +122,62 @@ export default function Home() {
     setEditingIndex(null);
   };
 
+  const locationPresets = {
+    "Siargao Spots": {
+      origin: "Amihan Bungalows Siargao",
+      destinations: [
+        "Cloud 9 Siargao",
+        "Haole Siargao",
+        "Magpupungko Siargao",
+        "Tayangban Cave",
+        "Maasin River",
+        "Naked Island",
+        "Guyam Island",
+      ],
+    },
+    "Manila CBD": {
+      origin: "SM Aura Tower",
+      destinations: [
+        "Bonifacio Global City",
+        "SM Makati",
+        "Greenbelt Mall",
+        "Rockwell Center",
+        "Power Plant Mall",
+        "Ayala Triangle Gardens",
+        "Market Market",
+      ],
+    },
+    "Cebu City": {
+      origin: "SM City Cebu",
+      destinations: [
+        "Ayala Center Cebu",
+        "Cebu IT Park",
+        "SM Seaside City",
+        "Robinsons Galleria Cebu",
+        "Cebu City Hall",
+      ],
+    },
+  };
+
+  const handleLoadPreset = (presetName: string) => {
+    const preset = locationPresets[presetName as keyof typeof locationPresets];
+    setOrigin(preset.origin);
+    setMaps(preset.destinations);
+    setShowPresets(false);
+    toast({
+      title: "Preset Loaded",
+      description: `Loaded ${presetName} preset with ${preset.destinations.length} destinations.`,
+    });
+  };
+
+  const handleRemoveAll = () => {
+    setMaps([]);
+    toast({
+      title: "All Destinations Removed",
+      description: "All destinations have been cleared from the list.",
+    });
+  };
+
   return (
     <main className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
       <div className="space-y-3 sm:space-y-4">
@@ -121,10 +194,49 @@ export default function Home() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="w-full">
           <CardHeader className="px-4 sm:px-6">
-            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
-              Origin: {origin.split("+").join(" ") || "None"}
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
+                Origin: {origin.split("+").join(" ") || "None"}
+              </CardTitle>
+              <Dialog open={showPresets} onOpenChange={setShowPresets}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="whitespace-nowrap"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Location Presets
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Location Presets</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    {Object.entries(locationPresets).map(
+                      ([presetName, preset]) => (
+                        <Button
+                          key={presetName}
+                          variant="outline"
+                          className="w-full justify-start h-auto py-3"
+                          onClick={() => handleLoadPreset(presetName)}
+                        >
+                          <div className="flex flex-col items-start">
+                            <span className="font-medium">{presetName}</span>
+                            <span className="text-xs text-muted-foreground mt-1">
+                              Origin: {preset.origin} •{" "}
+                              {preset.destinations.length} destinations
+                            </span>
+                          </div>
+                        </Button>
+                      )
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4 px-4 sm:px-6">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
