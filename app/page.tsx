@@ -131,19 +131,41 @@ export default function Home() {
 
       <Separator className="my-4 sm:my-6" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        {maps.map((destination, index) => (
-          <Map
-            origin={origin}
-            mode={mode}
-            convertText={convertText}
-            maps={maps}
-            setMaps={setMaps}
-            mapNumber={index}
-            key={index}
-          />
-        ))}
-      </div>
+      {maps.length === 0 ? (
+        <Card className="w-full border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+            <MapPin className="h-12 w-12 text-muted-foreground" />
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">
+                No destinations added yet
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-sm">
+                Click the &quot;Add Map&quot; button above to start comparing
+                distances from your origin to different destinations.
+              </p>
+            </div>
+            <Button variant="outline" onClick={handleAddMap} className="mt-2">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Your First Map
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          {maps.map((destination, index) => (
+            <Map
+              origin={origin}
+              mode={mode}
+              convertText={convertText}
+              maps={maps}
+              setMaps={setMaps}
+              mapNumber={index}
+              key={index}
+            />
+          ))}
+        </div>
+      )}
+
       <Toaster />
     </main>
   );
