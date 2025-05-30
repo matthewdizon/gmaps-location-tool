@@ -27,6 +27,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Image from "next/image";
 
 export default function Home() {
   const [origin, setOrigin] = useState("Amihan Bungalows Siargao");
@@ -180,15 +181,24 @@ export default function Home() {
 
   return (
     <main className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
-      <div className="space-y-3 sm:space-y-4">
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-          Google Maps Location Tool
-        </h1>
-        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
-          This tool helps you figure out the distance from one location to
-          another. Perfect for understanding how far a property is from key
-          locations like your workplace, university, or shopping centers.
-        </p>
+      <div className="flex items-start gap-4">
+        <Image
+          src="/images/gmaps-tool-logo.png"
+          alt="Google Maps Tool Logo"
+          width={64}
+          height={64}
+          priority
+        />
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+            Google Maps Location Tool
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
+            This tool helps you figure out the distance from one location to
+            another. Perfect for understanding how far a property is from key
+            locations like your workplace, university, or shopping centers.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
