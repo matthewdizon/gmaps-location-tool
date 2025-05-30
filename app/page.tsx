@@ -9,23 +9,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Share2, Plus, MapPin } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Home() {
   const [origin, setOrigin] = useState("Amihan Bungalows Siargao");
   const [mode, setMode] = useState("driving");
   const [maps, setMaps] = useState(["Cloud 9 Boardwalk"]);
   const searchParams = useSearchParams();
+  const { toast } = useToast();
 
   const originSearch = searchParams.get("origin") || origin;
   const destinationSearch = searchParams.get("destination") || maps[0];
   const destinations = destinationSearch?.split(",");
 
   const modes = [
-    "🚗 driving",
-    "🚶‍♂️ walking",
-    "🚴‍♂️ bicycling",
-    "🚌 transit",
-    "✈️ flying",
+    "🚗 Driving",
+    "🚶‍♂️ Walking",
+    "🚴‍♂️ Bicycling",
+    "🚌 Transit",
+    "✈️ Flying",
   ];
 
   const convertText = (text: string) => {
@@ -40,6 +43,26 @@ export default function Home() {
       setMaps(destinations);
     }
   }, []);
+
+  const handleAddMap = () => {
+    setMaps((maps) => [...maps, ""]);
+    toast({
+      title: "Map Added",
+      description:
+        "A new map has been added. Enter an additional destination to compare.",
+    });
+  };
+
+  const handleShareUrl = () => {
+    const url = `http://${
+      window.location.host
+    }/?origin=${origin}&destination=${maps.join(",")}`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "URL Copied",
+      description: "The current maps have been copied to your clipboard.",
+    });
+  };
 
   return (
     <main className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
@@ -73,7 +96,7 @@ export default function Home() {
             <div className="flex gap-2 sm:gap-3">
               <Button
                 variant="outline"
-                onClick={() => setMaps((maps) => [...maps, ""])}
+                onClick={handleAddMap}
                 className="flex-1 sm:flex-none whitespace-nowrap text-sm sm:text-base"
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -81,13 +104,7 @@ export default function Home() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    `http://${
-                      window.location.host
-                    }/?origin=${origin}&destination=${maps.join(",")}`
-                  )
-                }
+                onClick={handleShareUrl}
                 className="flex-1 sm:flex-none whitespace-nowrap text-sm sm:text-base"
               >
                 <Share2 className="h-4 w-4 mr-2" />
@@ -101,7 +118,7 @@ export default function Home() {
               {modes.map((travelMode, index) => (
                 <TabsTrigger
                   key={index}
-                  value={travelMode.split(" ")[1]}
+                  value={travelMode.split(" ")[1].toLowerCase()}
                   className="text-xs sm:text-sm py-2 px-1 sm:px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   {travelMode}
@@ -127,6 +144,7 @@ export default function Home() {
           />
         ))}
       </div>
+      <Toaster />
     </main>
   );
 }
