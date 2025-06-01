@@ -65,7 +65,10 @@ export default function Home() {
   }, []);
 
   const handleAddMap = () => {
+    const newIndex = maps.length;
     setMaps((maps) => [...maps, ""]);
+    setEditingIndex(newIndex);
+    setEditValue("");
     toast({
       title: "Map Added",
       description:
