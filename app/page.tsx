@@ -29,6 +29,16 @@ import {
 } from "@/components/ui/dialog";
 import Image from "next/image";
 
+type SavedSet = {
+  id: string;
+  name: string;
+  origin: string;
+  destinations: string[];
+  mode: string;
+};
+
+const SAVED_SETS_STORAGE_KEY = "saved-location-sets";
+
 export default function Home() {
   const [origin, setOrigin] = useState("Amihan Bungalows Siargao");
   const [mode, setMode] = useState("driving");
@@ -38,6 +48,10 @@ export default function Home() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [showPresets, setShowPresets] = useState(false);
+  const [savedSets, setSavedSets] = useState<SavedSet[]>([]);
+  const [showSavedSets, setShowSavedSets] = useState(false);
+  const [saveSetName, setSaveSetName] = useState("");
+  const [hasLoadedSavedSets, setHasLoadedSavedSets] = useState(false);
 
   const originSearch = searchParams.get("origin") || origin;
   const destinationSearch = searchParams.get("destination") || maps[0];
@@ -63,6 +77,31 @@ export default function Home() {
       setMaps(destinations);
     }
   }, []);
+
+  useEffect(() => {
+    const storedSets = localStorage.getItem(SAVED_SETS_STORAGE_KEY);
+    if (!storedSets) {
+      setHasLoadedSavedSets(true);
+      return;
+    }
+    try {
+      const parsedSets = JSON.parse(storedSets);
+      if (Array.isArray(parsedSets)) {
+        setSavedSets(parsedSets);
+      }
+    } catch (error) {
+      console.error("Failed to parse saved sets", error);
+    } finally {
+      setHasLoadedSavedSets(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedSavedSets) {
+      return;
+    }
+    localStorage.setItem(SAVED_SETS_STORAGE_KEY, JSON.stringify(savedSets));
+  }, [savedSets, hasLoadedSavedSets]);
 
   const handleAddMap = () => {
     const newIndex = maps.length;
@@ -124,6 +163,85 @@ export default function Home() {
 
   const handleCancelEdit = () => {
     setEditingIndex(null);
+  };
+
+  const handleSaveCurrentSet = () => {
+    const trimmedName = saveSetName.trim();
+    const trimmedOrigin = origin.trim();
+    const filteredDestinations = maps
+      .map((destination) => destination.trim())
+      .filter(Boolean);
+
+    if (!trimmedName) {
+      toast({
+        title: "Name Required",
+        description: "Please enter a name for this saved set.",
+      });
+      return;
+    }
+
+    if (!trimmedOrigin || filteredDestinations.length === 0) {
+      toast({
+        title: "Missing Locations",
+        description: "Add an origin and at least one destination before saving.",
+      });
+      return;
+    }
+
+    const existingSet = savedSets.find(
+      (set) => set.name.toLowerCase() === trimmedName.toLowerCase()
+    );
+
+    setSavedSets((currentSets) => {
+      const nextSet = {
+        id: existingSet?.id ?? `set-${Date.now()}`,
+        name: trimmedName,
+        origin: trimmedOrigin,
+        destinations: filteredDestinations,
+        mode,
+      };
+
+      if (existingSet) {
+        return currentSets.map((set) => (set.id === existingSet.id ? nextSet : set));
+      }
+
+      return [nextSet, ...currentSets];
+    });
+
+    setSaveSetName("");
+    toast({
+      title: existingSet ? "Saved Set Updated" : "Saved Set Created",
+      description: `Saved ${filteredDestinations.length} destinations for ${trimmedName}.`,
+    });
+  };
+
+  const handleLoadSavedSet = (setId: string) => {
+    const selectedSet = savedSets.find((set) => set.id === setId);
+    if (!selectedSet) {
+      return;
+    }
+
+    setOrigin(selectedSet.origin);
+    setMaps(selectedSet.destinations);
+    setMode(selectedSet.mode || "driving");
+    setShowSavedSets(false);
+    toast({
+      title: "Saved Set Loaded",
+      description: `Loaded ${selectedSet.name}.`,
+    });
+  };
+
+  const handleDeleteSavedSet = (setId: string) => {
+    const setToRemove = savedSets.find((set) => set.id === setId);
+    setSavedSets((currentSets) =>
+      currentSets.filter((set) => set.id !== setId)
+    );
+    toast({
+      title: "Saved Set Removed",
+      description: setToRemove
+        ? `Removed ${setToRemove.name}.`
+        : "Removed saved set.",
+    });
   };
 
   const locationPresets = {
@@ -212,43 +330,135 @@ export default function Home() {
                 <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
                 Origin: {origin.split("+").join(" ") || "None"}
               </CardTitle>
-              <Dialog open={showPresets} onOpenChange={setShowPresets}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="whitespace-nowrap w-full sm:w-auto"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Location Presets
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Location Presets</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    {Object.entries(locationPresets).map(
-                      ([presetName, preset]) => (
-                        <Button
-                          key={presetName}
-                          variant="outline"
-                          className="w-full justify-start h-auto py-3"
-                          onClick={() => handleLoadPreset(presetName)}
-                        >
-                          <div className="flex flex-col items-start">
-                            <span className="font-medium">{presetName}</span>
-                            <span className="text-xs text-muted-foreground mt-1">
-                              Origin: {preset.origin} •{" "}
-                              {preset.destinations.length} destinations
-                            </span>
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <Dialog open={showSavedSets} onOpenChange={setShowSavedSets}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="whitespace-nowrap w-full sm:w-auto"
+                    >
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Saved Sets
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[520px]">
+                    <DialogHeader>
+                      <DialogTitle>Saved Sets</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">
+                          Save your current locations
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Input
+                            value={saveSetName}
+                            onChange={(event) => setSaveSetName(event.target.value)}
+                            placeholder="e.g. House Hunt Week 1"
+                            className="flex-1"
+                          />
+                          <Button
+                            variant="default"
+                            className="whitespace-nowrap"
+                            onClick={handleSaveCurrentSet}
+                          >
+                            Save Set
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Saves the origin, destinations, and travel mode.
+                        </p>
+                      </div>
+                      <Separator />
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Your saved sets</p>
+                        {savedSets.length === 0 ? (
+                          <p className="text-xs text-muted-foreground">
+                            No saved sets yet. Save your first comparison above.
+                          </p>
+                        ) : (
+                          <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
+                            {savedSets.map((savedSet) => (
+                              <div
+                                key={savedSet.id}
+                                className="flex flex-col sm:flex-row sm:items-center gap-2 border rounded-md p-2"
+                              >
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium">
+                                    {savedSet.name}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Origin: {savedSet.origin.split("+").join(" ")} •{" "}
+                                    {savedSet.destinations.length} destinations •
+                                    Mode: {savedSet.mode || "driving"}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleLoadSavedSet(savedSet.id)}
+                                  >
+                                    Load
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-destructive hover:text-destructive"
+                                    onClick={() =>
+                                      handleDeleteSavedSet(savedSet.id)
+                                    }
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        </Button>
-                      )
-                    )}
-                  </div>
-                </DialogContent>
-              </Dialog>
+                        )}
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                <Dialog open={showPresets} onOpenChange={setShowPresets}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="whitespace-nowrap w-full sm:w-auto"
+                    >
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Location Presets
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Location Presets</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      {Object.entries(locationPresets).map(
+                        ([presetName, preset]) => (
+                          <Button
+                            key={presetName}
+                            variant="outline"
+                            className="w-full justify-start h-auto py-3"
+                            onClick={() => handleLoadPreset(presetName)}
+                          >
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium">{presetName}</span>
+                              <span className="text-xs text-muted-foreground mt-1">
+                                Origin: {preset.origin} •{" "}
+                                {preset.destinations.length} destinations
+                              </span>
+                            </div>
+                          </Button>
+                        )
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-3 px-2 sm:px-6">
